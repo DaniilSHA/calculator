@@ -15,7 +15,7 @@ import reactor.core.publisher.Flux;
 @RequestMapping
 public class CalculateController implements ApplicationContextAware {
 
-    ApplicationContext applicationContext;
+    private ApplicationContext applicationContext;
 
     @GetMapping(value = "/calculate", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<String> calculateUnOrdered() {
@@ -24,7 +24,8 @@ public class CalculateController implements ApplicationContextAware {
                 "calculationService",
                 CalculationService.class);
 
-        Flux<String> calculate = calculationService.calculateUnordered("", "", 4);
+        Flux<String> calculate = calculationService.calculateUnordered(
+                "function calc (n) {return 25/n}", "function calc (n) {return 25/n}", 4);
 
         calculate.subscribe(e -> System.out.println(e + " " + Thread.currentThread().getName()));
 
