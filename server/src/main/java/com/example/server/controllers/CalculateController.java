@@ -26,7 +26,7 @@ public class CalculateController implements ApplicationContextAware {
 
         Flux<String> calculate = calculationService.calculateUnordered("", "", 4);
 
-        calculate.subscribe(e -> System.out.println(e + Thread.currentThread().getName()));
+        calculate.subscribe(e -> System.out.println(e + " " + Thread.currentThread().getName()));
 
         return calculate;
     }

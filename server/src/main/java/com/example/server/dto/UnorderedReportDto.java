@@ -10,7 +10,7 @@ public class UnorderedReportDto implements ReportDto {
     private int iterationNumber;
     private int functionNumber;
     private double result;
-    private int calculateTime;
+    private long calculateTime;
 
     @Override
     public String getReportBody() {

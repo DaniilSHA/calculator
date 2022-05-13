@@ -24,10 +24,16 @@ public class CalculationService {
     private LinkedBlockingQueue<String> firstFunctionResult = new LinkedBlockingQueue<>();
     private LinkedBlockingQueue<String> secondFunctionResult = new LinkedBlockingQueue<>();
 
-    public Flux<String> calculateUnordered(String functionFirst, String functionSecond, int count) {
+    public Flux<String> calculateUnordered(String functionFirst, String functionSecond, int iterations) {
+        startUnorderedFunctionIterations(1,functionFirst, iterations);
+        startUnorderedFunctionIterations(2,functionSecond, iterations);
+        return Flux.from(createUnorderedPublisher(iterations));
+    }
 
+
+    private void startUnorderedFunctionIterations (int functionNumber, String function, int iterations) {
         CompletableFuture.runAsync(() -> {
-            for (int i = 0; i < count; i++) {
+            for (int i = 0; i < iterations; i++) {
 
                 try {
                     Thread.sleep(delay);
@@ -35,47 +41,34 @@ public class CalculationService {
                     e.printStackTrace();
                 }
 
-                int finalI = i;
+
+                int finalI = i+1;
                 CompletableFuture.supplyAsync(() -> {
+                    long startTime = System.currentTimeMillis();
 
 
-
-                    return new UnorderedReportDto(finalI, 1, 100, 100).getReportBody();
+                    long endTime = System.currentTimeMillis();
+                    return new UnorderedReportDto(finalI, functionNumber, 100, endTime-startTime).getReportBody();
                 }).thenAccept(report -> totalResult.add(report));
 
             }
         });
+    }
 
-        CompletableFuture.runAsync(() -> {
-            for (int i = 0; i < count; i++) {
-
-                try {
-                    Thread.sleep(delay);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-                int finalI = i;
-                CompletableFuture.supplyAsync(() -> {
-
-
-                    return new UnorderedReportDto(finalI, 2, 200, 200).getReportBody();
-                }).thenAccept(report -> totalResult.add(report));
-            }
-        });
-
-        return Flux.from((Publisher) subscriber -> {
+    private Publisher createUnorderedPublisher (int iterations){
+        return (subscriber) -> {
             int currentNumberOfSuccessfulRequests = 0;
+
             while (true) {
                 if (!totalResult.isEmpty()) {
                     subscriber.onNext(totalResult.get(0));
                     totalResult.remove(0);
-                    if (++currentNumberOfSuccessfulRequests == count * 2) {
+                    if (++currentNumberOfSuccessfulRequests == iterations * 2) {
                         subscriber.onComplete();
                         break;
                     }
                 }
             }
-        });
+        };
     }
 }
