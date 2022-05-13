@@ -5,11 +5,16 @@ import lombok.Data;
 
 @AllArgsConstructor
 @Data
-public class UnorderedReportDto {
+public class UnorderedReportDto implements ReportDto {
 
     private int iterationNumber;
     private int functionNumber;
     private double result;
     private int calculateTime;
+
+    @Override
+    public String getReportBody() {
+        return String.format("%3d; %3d; %8.2f; %6d", iterationNumber, functionNumber, result, calculateTime);
+    }
 
 }

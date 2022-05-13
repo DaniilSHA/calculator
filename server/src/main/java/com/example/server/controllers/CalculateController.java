@@ -9,32 +9,27 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.reactive.function.server.ServerRequest;
-import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
-import static org.springframework.web.reactive.function.server.ServerResponse.ok;
 
 @RestController
-@RequestMapping()
+@RequestMapping
 public class CalculateController implements ApplicationContextAware {
 
     ApplicationContext applicationContext;
 
-    @GetMapping("/calculate")
-    public Flux<UnorderedReportDto> calculateUnOrdered() {
+    @GetMapping(value = "/calculate", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<String> calculateUnOrdered() {
 
         CalculationService calculationService = applicationContext.getBean(
                 "calculationService",
                 CalculationService.class);
 
-        Flux<UnorderedReportDto> calculate = calculationService.calculate("", "", 2);
+        Flux<String> calculate = calculationService.calculateUnordered("", "", 4);
+
+        calculate.subscribe(e -> System.out.println(e + Thread.currentThread().getName()));
 
         return calculate;
     }
-
-
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
