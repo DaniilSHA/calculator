@@ -3,7 +3,6 @@ package com.example.server.service;
 import com.example.server.dto.UnorderedReportDto;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
-import org.reactivestreams.Subscriber;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -27,33 +26,43 @@ public class CalculationService {
 
     public Flux<String> calculateUnordered(String functionFirst, String functionSecond, int count) {
 
-        for (int i = 0; i < count; i++) {
+        CompletableFuture.runAsync(() -> {
+            for (int i = 0; i < count; i++) {
 
-            int finalI = i;
-            CompletableFuture.supplyAsync(() -> {
                 try {
-                    Thread.sleep(2000);
+                    Thread.sleep(delay);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                return new UnorderedReportDto(finalI, 1, 100, 100).getReportBody();
-            }).thenAccept(report -> totalResult.add(report));
 
-        }
+                int finalI = i;
+                CompletableFuture.supplyAsync(() -> {
 
-        for (int i = 0; i < count; i++) {
 
-            int finalI = i;
-            CompletableFuture.supplyAsync(() -> {
+
+                    return new UnorderedReportDto(finalI, 1, 100, 100).getReportBody();
+                }).thenAccept(report -> totalResult.add(report));
+
+            }
+        });
+
+        CompletableFuture.runAsync(() -> {
+            for (int i = 0; i < count; i++) {
+
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(delay);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                return new UnorderedReportDto(finalI, 2, 200, 200).getReportBody();
-            }).thenAccept(report -> totalResult.add(report));
 
-        }
+                int finalI = i;
+                CompletableFuture.supplyAsync(() -> {
+
+
+                    return new UnorderedReportDto(finalI, 2, 200, 200).getReportBody();
+                }).thenAccept(report -> totalResult.add(report));
+            }
+        });
 
         return Flux.from((Publisher) subscriber -> {
             int currentNumberOfSuccessfulRequests = 0;
@@ -61,7 +70,7 @@ public class CalculationService {
                 if (!totalResult.isEmpty()) {
                     subscriber.onNext(totalResult.get(0));
                     totalResult.remove(0);
-                    if (++currentNumberOfSuccessfulRequests == count*2) {
+                    if (++currentNumberOfSuccessfulRequests == count * 2) {
                         subscriber.onComplete();
                         break;
                     }
