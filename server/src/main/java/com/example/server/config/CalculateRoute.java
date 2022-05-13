@@ -13,19 +13,19 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 @Configuration
 public class CalculateRoute {
 
-    @Bean
-    public RouterFunction<ServerResponse> route (CalculateHandler calculateHandler) {
-        return RouterFunctions
-                .route(
-                        GET("/calculate")
-                                .and(accept(MediaType.ALL)
-                                .and(queryParam("order", "ordered"))),
-                        calculateHandler::calculateOrdered)
-                .andRoute(
-                        GET("/calculate")
-                                .and(accept(MediaType.ALL)
-                                .and(queryParam("order", "unordered"))),
-                        calculateHandler::calculateUnOrdered);
-    }
+//    @Bean
+//    public RouterFunction<ServerResponse> route (CalculateHandler calculateHandler) {
+//        return RouterFunctions
+//                .route(
+//                        GET("/calculate")
+//                                .and(accept(MediaType.ALL)
+//                                .and(queryParam("order", "ordered"))),
+//                        calculateHandler::calculateOrdered)
+//                .andRoute(
+//                        GET("/calculate")
+//                                .and(accept(MediaType.ALL)
+//                                .and(queryParam("order", "unordered"))),
+//                        calculateHandler::calculateUnOrdered);
+//    }
 
 }
