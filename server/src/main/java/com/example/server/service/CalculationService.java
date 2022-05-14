@@ -1,6 +1,7 @@
 package com.example.server.service;
 
-import com.example.server.dto.UnorderedReportDto;
+import com.example.server.reports.UnorderedReport;
+import com.example.server.exceptions.InvalidInputParamException;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
 import org.springframework.beans.BeansException;
@@ -37,6 +38,9 @@ public class CalculationService implements ApplicationContextAware {
         return Flux.from(createUnorderedPublisher(iterations));
     }
 
+    public Flux<String> calculateOrdered(String firstFunction, String secondFunction, Integer iterations) {
+        return null;
+    }
 
     private void startUnorderedFunctionIterations(int functionNumber, String function, int iterations) {
         CompletableFuture.runAsync(() -> {
@@ -59,13 +63,15 @@ public class CalculationService implements ApplicationContextAware {
                                 .eval(functionConverterToCurrentIteration(function,finalI))
                                 .toString());
                     } catch (ClassCastException | ScriptException e) {
-                        e.printStackTrace();
+                        log.error("INVALID FUNCTION #"+functionNumber);
+                        throw new InvalidInputParamException("INVALID FUNCTION #" + functionNumber);
                     }
 
                     long endTime = System.currentTimeMillis();
-                    return new UnorderedReportDto(finalI, functionNumber, functionResult, endTime - startTime).getReportBody();
-                }).thenAccept(report -> totalResult.add(report));
-
+                    return new UnorderedReport(finalI, functionNumber, functionResult, endTime - startTime).getReportBody();
+                })
+                        .exceptionally(Throwable::getMessage)
+                        .thenAccept(report -> totalResult.add(report));
             }
         });
     }
@@ -91,7 +97,6 @@ public class CalculationService implements ApplicationContextAware {
         String functionName = function.substring(function.indexOf("on")+3, function.indexOf("(")-1);
         return function + functionName + "(" + currentIteration + ")";
     }
-
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {

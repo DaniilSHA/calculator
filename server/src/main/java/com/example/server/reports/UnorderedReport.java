@@ -1,11 +1,11 @@
-package com.example.server.dto;
+package com.example.server.reports;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @AllArgsConstructor
 @Data
-public class UnorderedReportDto implements ReportDto {
+public class UnorderedReport implements Report {
 
     private int iterationNumber;
     private int functionNumber;
