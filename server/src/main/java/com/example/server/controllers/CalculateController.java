@@ -16,7 +16,7 @@ public class CalculateController implements ApplicationContextAware {
 
     private ApplicationContext applicationContext;
 
-    @PostMapping(value = "/calculate", produces = MediaType.TEXT_EVENT_STREAM_VALUE, consumes = {MediaType.APPLICATION_JSON_VALUE})
+    @PostMapping(value = "/calculate", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<String> calculate(@RequestBody CalculateRequest request) {
 
         System.out.println(request);
@@ -31,7 +31,6 @@ public class CalculateController implements ApplicationContextAware {
                         request.getFirstFunction(),
                         request.getSecondFunction(),
                         request.getIterations());
-//                stringFlux.subscribe(System.out::println);
                 return stringFlux;
             }
             case "ordered" : return calculationService.calculateOrdered(
@@ -42,13 +41,6 @@ public class CalculateController implements ApplicationContextAware {
             default: throw new InvalidInputParamException("INVALID ORDER PARAM");
         }
     }
-
-    @GetMapping(value = "/calculate", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<String> calculatebyGet () {
-        return calculate(new CalculateRequest("function calc (n) {return 2+n}",
-                "function calc (n) {return 2+n}", 5, "unordered"));
-    }
-
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
