@@ -23,18 +23,28 @@
 //     document.getElementById('dataBlock').append(div);
 // };
 
+let functionFirstValue
+let functionSecondValue
+let iterationsValue
+let orderValue
 
 document.querySelector(".get-report-button").addEventListener("click", () => {
+
+    functionFirstValue = document.querySelector(".first-function-input").value;
+    functionSecondValue = document.querySelector(".second-function-input").value;
+    iterationsValue = document.querySelector(".iterations-input").value;
+    orderValue = document.querySelector(".order-input").value;
+
     fetch("http://localhost:9090/calculate", {
         method: "POST",
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            firstFunction: 'as',
-            secondFunction: 'as',
-            itr : 4,
-            order : 'unordered'
+            firstFunction: functionFirstValue,
+            secondFunction: functionSecondValue,
+            itr : iterationsValue,
+            order : orderValue
         })
     }).then(() => console.log('good'))
 

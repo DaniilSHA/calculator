@@ -10,7 +10,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 
 @RestController
-@RequestMapping("/")
+@RequestMapping()
 public class CalculateController {
 
     WebClient client;
@@ -25,7 +25,7 @@ public class CalculateController {
 
         System.out.println(request);
 
-        Flux<String> unorderedReportDtoFlux = client
+        Flux<String> serverResponse = client
                 .post()
                 .uri("/calculate")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -34,9 +34,9 @@ public class CalculateController {
                 .retrieve()
                 .bodyToFlux(String.class);
 
-        unorderedReportDtoFlux.subscribe(System.out::println);
+        serverResponse.subscribe(System.out::println);
 
-        return null;
+        return serverResponse;
     }
 
 

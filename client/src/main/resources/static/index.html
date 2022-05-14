@@ -8,14 +8,49 @@
     <div class="form-container">
         <h1>Calculate application</h1>
         <form>
+            <div class="example-container">
+                <div class="template-example">
+                    <span>JavaScript function template - </span>
+                    <span>function NAME (ONE-PARAM-NAME) {return [js code that return number]}</span>
+                </div>
+                <div class="first-example">
+                    <span>You can use this example for first function - </span>
+                    <span>function calc (n) {return 2*n+(3-6)/8}</span>
+                </div>
+                <div class="second-example">
+                    <span>You can use this example for second function - </span>
+                    <span>function calc (n) {return 2*n+(3-6)/8}</span>
+                </div>
+            </div>
 
+            <div class="params">
+                <label>First function: </label>
+                <input class="first-function-input" type="text">
+            </div>
 
+            <div class="params">
+                <label>Second function: </label>
+                <input class="second-function-input" type="text">
+            </div>
+
+            <div class="params">
+                <label>Iterations: </label>
+                <input class="iterations-input" type="number">
+            </div>
+
+            <div class="params">
+                <select class="order-input">
+                    <option selected>unordered</option>
+                    <option >ordered</option>
+                </select>
+            </div>
 
             <button type="button" class="get-report-button">Get report</button>
         </form>
+    </div>
+    <div class="report-container">
 
     </div>
-    <div class="report-container"></div>
 <script src="https://unpkg.com/can-ndjson-stream@0.1.6/dist/global/can-ndjson-stream.js"></script>
 <script src="./webclient.js"></script>
 </body>
