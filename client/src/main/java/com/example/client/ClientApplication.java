@@ -16,29 +16,21 @@ public class ClientApplication {
 
         WebClient client = WebClient.create("http://localhost:8080");
 
-//        Flux<String> unorderedReportDtoFlux = client
-//                .post()
-//                .uri("/calculate")
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .accept(MediaType.TEXT_EVENT_STREAM)
-//                .body(BodyInserters.fromValue((
-//                        new CalculateResponse(
-//                                "function calc (n) {return 2+n}",
-//                                "function calc (n) {return 2+n}",
-//                                6,
-//                                "unordered"))
-//                ))
-//                .retrieve()
-//                .bodyToFlux(String.class);
-
-
         Flux<String> unorderedReportDtoFlux = client
-                .get()
+                .post()
                 .uri("/calculate")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.TEXT_EVENT_STREAM)
+                .body(BodyInserters.fromValue((
+                        new CalculateResponse(
+                                "function calc (n) {return 2+n}",
+                                "function calc (n) {return 2+n}",
+                                6,
+                                "unordered"))
+                ))
                 .retrieve()
                 .bodyToFlux(String.class);
 
-        System.out.println("heelow");
 
         unorderedReportDtoFlux.subscribe(System.out::println);
 

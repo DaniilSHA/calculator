@@ -11,6 +11,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Sinks;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
@@ -35,7 +36,7 @@ public class CalculationService implements ApplicationContextAware {
     public Flux<String> calculateUnordered(String functionFirst, String functionSecond, int iterations) {
         startUnorderedFunctionIterations(1, functionFirst, iterations);
         startUnorderedFunctionIterations(2, functionSecond, iterations);
-        return Flux.from(createUnorderedPublisher(iterations));
+        return createUnorderedPublisher(iterations);
     }
 
     public Flux<String> calculateOrdered(String firstFunction, String secondFunction, Integer iterations) {
@@ -76,21 +77,25 @@ public class CalculationService implements ApplicationContextAware {
         });
     }
 
-    private Publisher createUnorderedPublisher(int iterations) {
-        return (subscriber) -> {
-            int currentNumberOfSuccessfulRequests = 0;
+    private Flux<String> createUnorderedPublisher(int iterations) {
 
+        Sinks.Many<String> publisher = Sinks.many().multicast().onBackpressureBuffer();
+
+        CompletableFuture.runAsync( () -> {
+            int currentNumberOfSuccessfulRequests = 0;
             while (true) {
                 if (!totalResult.isEmpty()) {
-                    subscriber.onNext(totalResult.get(0));
+                    publisher.emitNext(totalResult.get(0), (signalType, emitResult) -> false);
                     totalResult.remove(0);
                     if (++currentNumberOfSuccessfulRequests == iterations * 2) {
-                        subscriber.onComplete();
+                        publisher.emitComplete((signalType, emitResult) -> false);
                         break;
                     }
                 }
             }
-        };
+        });
+
+        return publisher.asFlux();
     }
 
     private synchronized String functionConverterToCurrentIteration(String function, int currentIteration) {

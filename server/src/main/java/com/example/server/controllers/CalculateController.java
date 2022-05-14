@@ -31,7 +31,7 @@ public class CalculateController implements ApplicationContextAware {
                         request.getFirstFunction(),
                         request.getSecondFunction(),
                         request.getIterations());
-                stringFlux.subscribe(System.out::println);
+//                stringFlux.subscribe(System.out::println);
                 return stringFlux;
             }
             case "ordered" : return calculationService.calculateOrdered(
