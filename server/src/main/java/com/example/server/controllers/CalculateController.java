@@ -27,21 +27,12 @@ public class CalculateController implements ApplicationContextAware {
                 "calculationService",
                 CalculationService.class);
 
-        switch (request.getOrder()) {
-            case "unordered" : {
-                return calculationService.calculateUnordered(
-                        request.getFirstFunction(),
-                        request.getSecondFunction(),
-                        request.getIterations());
-            }
-            case "ordered" : {
-                return calculationService.calculateOrdered(
-                        request.getFirstFunction(),
-                        request.getSecondFunction(),
-                        request.getIterations());
-            }
-            default: throw new InvalidInputParamException("INVALID ORDER PARAM");
-        }
+        return calculationService.calculate(
+                request.getOrder(),
+                request.getFirstFunction(),
+                request.getSecondFunction(),
+                request.getIterations()
+        );
     }
 
     @Override

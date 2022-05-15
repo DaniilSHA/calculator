@@ -34,20 +34,24 @@ public class CalculationService implements ApplicationContextAware {
     private LinkedBlockingQueue<String> firstFunctionResultAccumulator = new LinkedBlockingQueue<>();
     private LinkedBlockingQueue<String> secondFunctionResultAccumulator = new LinkedBlockingQueue<>();
 
-    public Flux<String> calculateUnordered(String functionFirst, String functionSecond, int iterations) {
-        if (functionFirst.trim().equals("") || functionSecond.trim().equals("")) return createErrorPublisher("EMPTY FUNCTION ERROR");
-        if (iterations==0) return createErrorPublisher("EMPTY ITERATIONS ERROR");
-        startFunctionIterations(1, functionFirst, iterations, report -> totalResultAccumulator.add(report));
-        startFunctionIterations(2, functionSecond, iterations, report -> totalResultAccumulator.add(report));
-        return createUnorderedPublisher(iterations);
-    }
+    public Flux<String> calculate(String order, String functionFirst, String functionSecond, int iterations) {
 
-    public Flux<String> calculateOrdered(String functionFirst, String functionSecond, Integer iterations) {
         if (functionFirst.trim().equals("") || functionSecond.trim().equals("")) return createErrorPublisher("EMPTY FUNCTION ERROR");
         if (iterations==0) return createErrorPublisher("EMPTY ITERATIONS ERROR");
-        startFunctionIterations(1, functionFirst, iterations, report -> firstFunctionResultAccumulator.add(report));
-        startFunctionIterations(2, functionSecond, iterations, report -> secondFunctionResultAccumulator.add(report));
-        return createOrderedPublisher(iterations);
+
+        switch (order) {
+            case "unordered" : {
+                startFunctionIterations(1, functionFirst, iterations, report -> totalResultAccumulator.add(report));
+                startFunctionIterations(2, functionSecond, iterations, report -> totalResultAccumulator.add(report));
+                return createUnorderedPublisher(iterations);
+            }
+            case "ordered" : {
+                startFunctionIterations(1, functionFirst, iterations, report -> firstFunctionResultAccumulator.add(report));
+                startFunctionIterations(2, functionSecond, iterations, report -> secondFunctionResultAccumulator.add(report));
+                return createOrderedPublisher(iterations);
+            }
+            default: return createErrorPublisher("INVALID ORDER PARAM");
+        }
     }
 
     private void startFunctionIterations(int functionNumber, String function, int iterations, Consumer<String> consumer) {
