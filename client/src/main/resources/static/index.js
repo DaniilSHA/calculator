@@ -74,9 +74,9 @@ function renderCurrentReportMsg(order, value) {
             const forthColumn = document.createElement("td");
 
             firstColumn.innerText = partsOfMsg[0]
-            secondColumn.innerText = partsOfMsg[1]
-            thirdColumn.innerText = partsOfMsg[2]
-            forthColumn.innerText = partsOfMsg[3]
+            secondColumn.innerText = partsOfMsg[1] === undefined ? '' : partsOfMsg[1]
+            thirdColumn.innerText = partsOfMsg[2] === undefined ? '' : partsOfMsg[2]
+            forthColumn.innerText = partsOfMsg[3] === undefined ? '' : partsOfMsg[3]
 
             currentRow.appendChild(firstColumn)
             currentRow.appendChild(secondColumn)

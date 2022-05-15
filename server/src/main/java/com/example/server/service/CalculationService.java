@@ -33,6 +33,8 @@ public class CalculationService implements ApplicationContextAware {
     private LinkedBlockingQueue<String> secondFunctionResult = new LinkedBlockingQueue<>();
 
     public Flux<String> calculateUnordered(String functionFirst, String functionSecond, int iterations) {
+        if (functionFirst.trim().equals("") || functionSecond.trim().equals("")) return createErrorPublisher("EMPTY FUNCTION ERROR");
+        if (iterations==0) return createErrorPublisher("EMPTY ITERATIONS ERROR");
         startUnorderedFunctionIterations(1, functionFirst, iterations);
         startUnorderedFunctionIterations(2, functionSecond, iterations);
         return createUnorderedPublisher(iterations);
@@ -64,13 +66,13 @@ public class CalculationService implements ApplicationContextAware {
                                 .toString());
                     } catch (ClassCastException | ScriptException e) {
                         log.error("INVALID FUNCTION #"+functionNumber);
-                        throw new InvalidInputParamException("INVALID FUNCTION #" + functionNumber);
+                        throw new InvalidInputParamException("[INVALID FUNCTION #" + functionNumber+"]");
                     }
 
                     long endTime = System.currentTimeMillis();
                     return new UnorderedReport(finalI, functionNumber, functionResult, endTime - startTime).getReportBody();
                 })
-                        .exceptionally(Throwable::getMessage)
+                        .exceptionally(throwable -> "[INVALID FUNCTION #"+functionNumber+"]")
                         .thenAccept(report -> totalResult.add(report));
             }
         });
@@ -92,6 +94,18 @@ public class CalculationService implements ApplicationContextAware {
                     }
                 }
             }
+        });
+
+        return publisher.asFlux();
+    }
+
+    private Flux<String> createErrorPublisher(String error) {
+
+        Sinks.Many<String> publisher = Sinks.many().multicast().onBackpressureBuffer();
+
+        CompletableFuture.runAsync( () -> {
+            publisher.emitNext("["+error+"]", (signalType, emitResult) -> false);
+            publisher.emitComplete((signalType, emitResult) -> false);
         });
 
         return publisher.asFlux();
