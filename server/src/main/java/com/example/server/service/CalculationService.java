@@ -179,9 +179,6 @@ public class CalculationService implements ApplicationContextAware {
             dataFromSecondReport = reportSecond.substring(1,reportSecond.length()-1).split(";");
         }
 
-        log.error(String.valueOf(firstFunctionResultAccumulator.size()));
-        log.error(String.valueOf(secondFunctionResultAccumulator.size()));
-
         return OrderedReport.builder()
                 .iterationNumber(String.valueOf(currentNumberOfSuccessfulRequests))
                 .firstFunctionResult(dataFromFirstReport[2])

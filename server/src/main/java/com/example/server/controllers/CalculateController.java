@@ -29,21 +29,16 @@ public class CalculateController implements ApplicationContextAware {
 
         switch (request.getOrder()) {
             case "unordered" : {
-                Flux<String> stringFlux = calculationService.calculateUnordered(
+                return calculationService.calculateUnordered(
                         request.getFirstFunction(),
                         request.getSecondFunction(),
                         request.getIterations());
-                return stringFlux;
             }
             case "ordered" : {
-                Flux<String> stringFlux = calculationService.calculateOrdered(
+                return calculationService.calculateOrdered(
                         request.getFirstFunction(),
                         request.getSecondFunction(),
                         request.getIterations());
-
-                stringFlux.subscribe(System.out::println);
-
-                return stringFlux;
             }
             default: throw new InvalidInputParamException("INVALID ORDER PARAM");
         }

@@ -28,11 +28,11 @@ h1 {
     height: 30px;
     width: 35%;
     text-align: right;
+    margin: 0.3rem;
 }
 
 .second-part-of-example, input, select {
-    display: inline-block;
-    height: 30px;
+    height: 40px;
     width: 60%;
     text-align: center;
     background: olivedrab;
@@ -43,4 +43,14 @@ h1 {
 
 input, select {
     background: antiquewhite;
+}
+
+.template-example, .first-example, .second-example {
+    display: flex;
+
+}
+
+.important-msg {
+    display: block;
+    color: blue;
 }
