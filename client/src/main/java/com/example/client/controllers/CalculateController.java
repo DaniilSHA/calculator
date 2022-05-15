@@ -1,6 +1,7 @@
 package com.example.client.controllers;
 
 import com.example.client.dto.CalculateRequestAndResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
@@ -11,6 +12,7 @@ import reactor.core.publisher.Flux;
 
 @RestController
 @RequestMapping()
+@Slf4j
 public class CalculateController {
 
     WebClient client;
@@ -25,7 +27,7 @@ public class CalculateController {
             produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<String> calculate(@RequestBody CalculateRequestAndResponse request) {
 
-        System.out.println(request);
+        log.info("CONTROLLER RECEIVE REQUEST:" + request);
 
         Flux<String> serverResponse = client
                 .post()
@@ -36,7 +38,7 @@ public class CalculateController {
                 .retrieve()
                 .bodyToFlux(String.class);
 
-        serverResponse.subscribe(System.out::println);
+        serverResponse.subscribe(e -> log.info("ANSWER FROM SERVER: " + e));
 
         return serverResponse;
     }
