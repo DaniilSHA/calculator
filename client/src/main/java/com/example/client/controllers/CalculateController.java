@@ -39,8 +39,6 @@ public class CalculateController {
                 .bodyToFlux(String.class)
                 .doOnError(e->log.error(e.getMessage()));
 
-        serverResponse.subscribe(e -> log.info("ANSWER FROM SERVER: " + e));
-
         return serverResponse;
     }
 
