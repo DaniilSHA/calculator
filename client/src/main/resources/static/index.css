@@ -1,7 +1,46 @@
 table, th, td {
-    border: 1px solid white;
+    border: 1px solid black;
     border-collapse: collapse;
 }
 th, td {
     background-color: rosybrown;
+}
+
+h1 {
+    text-align: center;
+}
+
+.example-container, .params-container, .form-buttons {
+    margin: 0.3rem;
+    padding: 0.3rem;
+    background: aqua;
+    border: 1px solid black;
+    border-radius: 1rem;
+    text-align: center;
+}
+
+.params {
+    margin: 0.3rem;
+}
+
+.first-part-of-example, label {
+    display: inline-block;
+    height: 30px;
+    width: 35%;
+    text-align: right;
+}
+
+.second-part-of-example, input, select {
+    display: inline-block;
+    height: 30px;
+    width: 60%;
+    text-align: center;
+    background: olivedrab;
+    border: 1px solid black;
+    border-radius: 1rem;
+    margin: 0.3rem;
+}
+
+input, select {
+    background: antiquewhite;
 }

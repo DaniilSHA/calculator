@@ -6,24 +6,25 @@
     <link rel="stylesheet" href="index.css">
 </head>
 <body>
-    <div class="form-container">
-        <h1>Calculate application</h1>
-        <form>
-            <div class="example-container">
-                <div class="template-example">
-                    <span class="first-part-of-example">JavaScript function template - </span>
-                    <span class="second-part-of-example">function NAME (ONE-PARAM-NAME) {return [js code that return number]}</span>
-                </div>
-                <div class="first-example">
-                    <span class="first-part-of-example">>You can use this example for first function - </span>
-                    <span class="second-part-of-example">function calc (n) {return 2*n+(3-6)/8}</span>
-                </div>
-                <div class="second-example">
-                    <span class="first-part-of-example">>You can use this example for second function - </span>
-                    <span class="second-part-of-example">function calc (n) {return 2*n+(3-6)/8}</span>
-                </div>
+<div class="form-container">
+    <h1>Calculate application</h1>
+    <form>
+        <div class="example-container">
+            <div class="template-example">
+                <span class="first-part-of-example">JavaScript function template - </span>
+                <span class="second-part-of-example">function NAME (ONE-PARAM-NAME) {return [js code that return number]}</span>
             </div>
+            <div class="first-example">
+                <span class="first-part-of-example">You can use this example for first function - </span>
+                <span class="second-part-of-example">function calc (n) {return 2*n+(3-6)/8}</span>
+            </div>
+            <div class="second-example">
+                <span class="first-part-of-example">You can use this example for second function - </span>
+                <span class="second-part-of-example">function calc (n) {return 2*n+(3-6)/8}</span>
+            </div>
+        </div>
 
+        <div class="params-container">
             <div class="params">
                 <label>First function: </label>
                 <input class="first-function-input" type="text">
@@ -40,22 +41,23 @@
             </div>
 
             <div class="params">
+                <label>Iterations: </label>
                 <select class="order-input">
                     <option selected>unordered</option>
-                    <option >ordered</option>
+                    <option>ordered</option>
                 </select>
             </div>
-
-            <div class="form-buttons">
-                <button type="button"  class="get-report-button">Get report</button>
-                <button type="button"  class="reset-report-button">Reset report</button>
-            </div>
-        </form>
-    </div>
-    <div class="report-container">
-        <h1>Report</h1>
-        <table class="report-table"></table>
-    </div>
-<script src="webclientt.js"></script>
+        </div>
+        <div class="form-buttons">
+            <button type="button" class="get-report-button">Get report</button>
+            <button type="button" class="reset-report-button">Reset report</button>
+        </div>
+    </form>
+</div>
+<div class="report-container">
+    <h1>Report</h1>
+    <table class="report-table"></table>
+</div>
+<script src="index.js"></script>
 </body>
 </html>

@@ -62,29 +62,29 @@ function renderCurrentReportMsg(order, value) {
 
     if (order === 'unordered') {
 
-        const partsOfMsg = new TextDecoder().decode(value).split(";");
+        const commonMsg = new TextDecoder().decode(value);
 
-        const currentRow = document.createElement("tr");
-        const firstColumn = document.createElement("td");
-        const secondColumn = document.createElement("td");
-        const thirdColumn = document.createElement("td");
-        const forthColumn = document.createElement("td");
+        for (let msg of commonMsg.split("\n\n\n")) {
+            const partsOfMsg = msg.slice(msg.indexOf('[') + 1, msg.indexOf(']')).split(";");
 
-        firstColumn.innerText = partsOfMsg[0]
-        secondColumn.innerText = partsOfMsg[1]
-        thirdColumn.innerText = partsOfMsg[2]
-        forthColumn.innerText = partsOfMsg[3]
+            const currentRow = document.createElement("tr");
+            const firstColumn = document.createElement("td");
+            const secondColumn = document.createElement("td");
+            const thirdColumn = document.createElement("td");
+            const forthColumn = document.createElement("td");
 
-        currentRow.appendChild(firstColumn)
-        currentRow.appendChild(secondColumn)
-        currentRow.appendChild(thirdColumn)
-        currentRow.appendChild(forthColumn)
-        reportTable.appendChild(currentRow)
+            firstColumn.innerText = partsOfMsg[0]
+            secondColumn.innerText = partsOfMsg[1]
+            thirdColumn.innerText = partsOfMsg[2]
+            forthColumn.innerText = partsOfMsg[3]
 
-        console.log(partsOfMsg)
-
+            currentRow.appendChild(firstColumn)
+            currentRow.appendChild(secondColumn)
+            currentRow.appendChild(thirdColumn)
+            currentRow.appendChild(forthColumn)
+            reportTable.appendChild(currentRow)
+        }
     }
-
 }
 
 function renderHeader(order) {
