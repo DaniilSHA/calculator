@@ -1,6 +1,7 @@
 package com.example.server.reports;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 @AllArgsConstructor

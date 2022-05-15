@@ -1,26 +1,28 @@
 package com.example.server.reports;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 @AllArgsConstructor
 @Data
+@Builder
 public class OrderedReport implements Report{
 
-    private int iterationNumber;
+    private String iterationNumber;
 
-    private double firstFunctionResult;
-    private long calculateTimeFirstFunction;
-    private int countFutureResultFunctionFirst;
+    private String firstFunctionResult;
+    private String calculateTimeFirstFunction;
+    private String countFutureResultFunctionFirst;
 
-    private double secondFunctionResult;
-    private long calculateTimeSecondFunction;
-    private int countFutureResultFunctionSecond;
+    private String secondFunctionResult;
+    private String calculateTimeSecondFunction;
+    private String countFutureResultFunctionSecond;
 
 
     @Override
     public String getReportBody() {
-        return String.format("[%d;%.2f;%d;%d;%.2f;%d;%d]",
+        return String.format("[%s;%s;%s;%s;%s;%s;%s]",
                 iterationNumber,
                 firstFunctionResult,
                 calculateTimeFirstFunction,

@@ -1,5 +1,6 @@
 package com.example.server.service;
 
+import com.example.server.reports.OrderedReport;
 import com.example.server.reports.UnorderedReport;
 import com.example.server.exceptions.InvalidInputParamException;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,7 @@ import javax.script.ScriptException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.function.Consumer;
 
 @Service
 @Scope("prototype")
@@ -28,23 +30,27 @@ public class CalculationService implements ApplicationContextAware {
 
     private ApplicationContext applicationContext;
 
-    private CopyOnWriteArrayList<String> totalResult = new CopyOnWriteArrayList<>();
-    private LinkedBlockingQueue<String> firstFunctionResult = new LinkedBlockingQueue<>();
-    private LinkedBlockingQueue<String> secondFunctionResult = new LinkedBlockingQueue<>();
+    private CopyOnWriteArrayList<String> totalResultAccumulator = new CopyOnWriteArrayList<>();
+    private LinkedBlockingQueue<String> firstFunctionResultAccumulator = new LinkedBlockingQueue<>();
+    private LinkedBlockingQueue<String> secondFunctionResultAccumulator = new LinkedBlockingQueue<>();
 
     public Flux<String> calculateUnordered(String functionFirst, String functionSecond, int iterations) {
         if (functionFirst.trim().equals("") || functionSecond.trim().equals("")) return createErrorPublisher("EMPTY FUNCTION ERROR");
         if (iterations==0) return createErrorPublisher("EMPTY ITERATIONS ERROR");
-        startUnorderedFunctionIterations(1, functionFirst, iterations);
-        startUnorderedFunctionIterations(2, functionSecond, iterations);
+        startFunctionIterations(1, functionFirst, iterations, report -> totalResultAccumulator.add(report));
+        startFunctionIterations(2, functionSecond, iterations, report -> totalResultAccumulator.add(report));
         return createUnorderedPublisher(iterations);
     }
 
-    public Flux<String> calculateOrdered(String firstFunction, String secondFunction, Integer iterations) {
-        return null;
+    public Flux<String> calculateOrdered(String functionFirst, String functionSecond, Integer iterations) {
+        if (functionFirst.trim().equals("") || functionSecond.trim().equals("")) return createErrorPublisher("EMPTY FUNCTION ERROR");
+        if (iterations==0) return createErrorPublisher("EMPTY ITERATIONS ERROR");
+        startFunctionIterations(1, functionFirst, iterations, report -> firstFunctionResultAccumulator.add(report));
+        startFunctionIterations(2, functionSecond, iterations, report -> secondFunctionResultAccumulator.add(report));
+        return createOrderedPublisher(iterations);
     }
 
-    private void startUnorderedFunctionIterations(int functionNumber, String function, int iterations) {
+    private void startFunctionIterations(int functionNumber, String function, int iterations, Consumer<String> consumer) {
         CompletableFuture.runAsync(() -> {
             for (int i = 0; i < iterations; i++) {
 
@@ -73,7 +79,7 @@ public class CalculationService implements ApplicationContextAware {
                     return new UnorderedReport(finalI, functionNumber, functionResult, endTime - startTime).getReportBody();
                 })
                         .exceptionally(throwable -> "[INVALID FUNCTION #"+functionNumber+"]")
-                        .thenAccept(report -> totalResult.add(report));
+                        .thenAccept(consumer);
             }
         });
     }
@@ -85,10 +91,40 @@ public class CalculationService implements ApplicationContextAware {
         CompletableFuture.runAsync( () -> {
             int currentNumberOfSuccessfulRequests = 0;
             while (true) {
-                if (!totalResult.isEmpty()) {
-                    publisher.emitNext(totalResult.get(0), (signalType, emitResult) -> false);
-                    totalResult.remove(0);
+                if (!totalResultAccumulator.isEmpty()) {
+                    publisher.emitNext(totalResultAccumulator.get(0), (signalType, emitResult) -> false);
+                    totalResultAccumulator.remove(0);
                     if (++currentNumberOfSuccessfulRequests == iterations * 2) {
+                        publisher.emitComplete((signalType, emitResult) -> false);
+                        break;
+                    }
+                }
+            }
+        });
+
+        return publisher.asFlux();
+    }
+
+    private Flux<String> createOrderedPublisher(int iterations) {
+
+        Sinks.Many<String> publisher = Sinks.many().multicast().onBackpressureBuffer();
+
+        CompletableFuture.runAsync( () -> {
+            int currentNumberOfSuccessfulRequests = 0;
+            while (true) {
+
+                if (!firstFunctionResultAccumulator.isEmpty() && !secondFunctionResultAccumulator.isEmpty()) {
+
+                    String unorderedReportFromFirstFunction = firstFunctionResultAccumulator.remove();
+                    String unorderedReportFromSecondFunction = secondFunctionResultAccumulator.remove();
+
+                    String commonReport = convertUnorderedReportsToOrderReport(
+                            unorderedReportFromFirstFunction,
+                            unorderedReportFromSecondFunction,
+                            ++currentNumberOfSuccessfulRequests);
+
+                    publisher.emitNext(commonReport, (signalType, emitResult) -> false);
+                    if (currentNumberOfSuccessfulRequests == iterations) {
                         publisher.emitComplete((signalType, emitResult) -> false);
                         break;
                     }
@@ -114,6 +150,48 @@ public class CalculationService implements ApplicationContextAware {
     private synchronized String functionConverterToCurrentIteration(String function, int currentIteration) {
         String functionName = function.substring(function.indexOf("on")+3, function.indexOf("(")-1);
         return function + functionName + "(" + currentIteration + ")";
+    }
+
+    private String convertUnorderedReportsToOrderReport(String reportFirst,
+                                                        String reportSecond,
+                                                        int currentNumberOfSuccessfulRequests){
+
+        String[] dataFromFirstReport;
+        String[] dataFromSecondReport;
+
+        if (reportFirst.contains("INVALID FUNCTION")){
+            dataFromFirstReport = new String[]{String.valueOf(currentNumberOfSuccessfulRequests),
+                    "1",
+                    "INVALID FUNCTION #1",
+                    "-1"
+            };
+        } else {
+            dataFromFirstReport = reportFirst.substring(1,reportFirst.length()-1).split(";");
+        }
+
+        if (reportSecond.contains("INVALID FUNCTION")){
+            dataFromSecondReport = new String[]{String.valueOf(currentNumberOfSuccessfulRequests),
+                    "1",
+                    "INVALID FUNCTION #2",
+                    "-1"
+            };
+        } else {
+            dataFromSecondReport = reportSecond.substring(1,reportSecond.length()-1).split(";");
+        }
+
+        log.error(String.valueOf(firstFunctionResultAccumulator.size()));
+        log.error(String.valueOf(secondFunctionResultAccumulator.size()));
+
+        return OrderedReport.builder()
+                .iterationNumber(String.valueOf(currentNumberOfSuccessfulRequests))
+                .firstFunctionResult(dataFromFirstReport[2])
+                .calculateTimeFirstFunction(dataFromFirstReport[3])
+                .countFutureResultFunctionFirst(String.valueOf(firstFunctionResultAccumulator.size()))
+                .secondFunctionResult(dataFromSecondReport[2])
+                .calculateTimeSecondFunction(dataFromSecondReport[3])
+                .countFutureResultFunctionSecond(String.valueOf(secondFunctionResultAccumulator.size()))
+                .build()
+                .getReportBody();
     }
 
     @Override
