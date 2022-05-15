@@ -28,7 +28,7 @@ public class CalculationService implements ApplicationContextAware {
 
     private ApplicationContext applicationContext;
 
-    public static CopyOnWriteArrayList<String> totalResult = new CopyOnWriteArrayList<>();
+    private CopyOnWriteArrayList<String> totalResult = new CopyOnWriteArrayList<>();
     private LinkedBlockingQueue<String> firstFunctionResult = new LinkedBlockingQueue<>();
     private LinkedBlockingQueue<String> secondFunctionResult = new LinkedBlockingQueue<>();
 
