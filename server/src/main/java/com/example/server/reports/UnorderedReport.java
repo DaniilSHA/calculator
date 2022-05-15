@@ -14,7 +14,7 @@ public class UnorderedReport implements Report {
 
     @Override
     public String getReportBody() {
-        return String.format("%3d; %3d; %8.2f; %6d", iterationNumber, functionNumber, result, calculateTime);
+        return String.format("%d;%d;%.2f;%d", iterationNumber, functionNumber, result, calculateTime);
     }
 
 }
