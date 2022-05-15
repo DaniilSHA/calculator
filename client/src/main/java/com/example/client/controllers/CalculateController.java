@@ -36,7 +36,8 @@ public class CalculateController {
                 .accept(MediaType.TEXT_EVENT_STREAM)
                 .body(BodyInserters.fromValue((request)))
                 .retrieve()
-                .bodyToFlux(String.class);
+                .bodyToFlux(String.class)
+                .doOnError(e->log.error(e.getMessage()));
 
         serverResponse.subscribe(e -> log.info("ANSWER FROM SERVER: " + e));
 

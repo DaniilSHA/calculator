@@ -1,7 +1,6 @@
 package com.example.server.controllers;
 
 import com.example.server.dto.CalculateRequest;
-import com.example.server.exceptions.InvalidInputParamException;
 import com.example.server.service.CalculationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
