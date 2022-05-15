@@ -20,7 +20,9 @@ public class CalculateController {
         this.client = client;
     }
 
-    @PostMapping(value = "/calculate", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/calculate",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<String> calculate(@RequestBody CalculateRequestAndResponse request) {
 
         System.out.println(request);

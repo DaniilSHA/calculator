@@ -46,7 +46,29 @@ document.querySelector(".get-report-button").addEventListener("click", () => {
             itr : iterationsValue,
             order : orderValue
         })
-    }).then(() => console.log('good'))
+    }).then((response) => {
+            const reader = response.body.getReader();
+            return new ReadableStream({
+                start(controller) {
+                    return pump();
+                    function pump() {
+                        return reader.read().then(({ done, value }) => {
+                            // When no more data needs to be consumed, close the stream
+                            if (done) {
+                                controller.close();
+                                return;
+                            }
+                            // Enqueue the next data chunk into our target stream
+                            controller.enqueue(value);
+                            return pump();
+                        });
+                    }
+                }
+            })
+        })
+        .then(stream => new Response(stream))
+        .then(response => console.log(response))
+
 
 })
 
